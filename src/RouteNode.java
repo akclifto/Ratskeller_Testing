@@ -11,17 +11,20 @@ public class RouteNode {
      * latitude coordinates, that will be mapped for each individual node.  The structure will be used to
      * populate a JSON file and provide node information for each bus stop and route.
      */
-    private int node_id;
+    private String name;
+    private String node_id;
     private float lon;
     private float lat;
     private List<RouteNode> node_list = new ArrayList<>();
 
-    public RouteNode() {
-        //ctor
+    public RouteNode(String name, String node_id) {
+        this.name = name;
+        this.node_id = node_id;
     }
 
-    public RouteNode(int node_id, float lat, float lon) {
+    public RouteNode(String name, String node_id, float lat, float lon) {
 
+        this.name = name;
         this.node_id = node_id;
         this.lat = lat;
         this.lon = lon;
@@ -36,11 +39,19 @@ public class RouteNode {
         return this;
     }
 
-    public void setNode_id(int node_id) {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setNode_id(String node_id) {
         this.node_id = node_id;
     }
 
-    public int getNode_id() {
+    public String getNode_id() {
         return this.node_id;
     }
 
@@ -58,6 +69,10 @@ public class RouteNode {
 
     public float getLon() {
         return this.lon;
+    }
+
+    public List<RouteNode> getNode_list() {
+        return node_list;
     }
 
     /**
@@ -84,9 +99,37 @@ public class RouteNode {
         }
     }
 
-    public List<RouteNode> getNode_list() {
-        return node_list;
+    @Override
+    public int hashCode(){
+        final int prime = 17;
+        int result = 1;
+        result = prime * result + ((node_id == null) ? 0 : node_id.hashCode());
+        return result;
     }
+
+    @Override
+    public boolean equals(Object object) {
+
+        if (this == object) {
+            return true;
+        }
+        if (object == null) {
+            return false;
+        }
+        if (getClass() != object.getClass()) {
+            return false;
+        }
+        RouteNode other = (RouteNode) object;
+        if (node_id == null) {
+            return other.node_id == null;
+        } else return node_id.equals(other.node_id);
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
 
 
 }

@@ -11,15 +11,12 @@ import java.util.*;
  */
 public class ShortestPath {
 
-    private RouteNode node;
-    private CalculateRoute calc;
-    private HashMap<Integer, RouteNode> nodeHashMap = new HashMap<>();
-    private final List<Vertex> nodeList;
+    private final List<RouteNode> nodeList;
     private final List<Edge> edgeList;
-    private Set<Vertex> visitedNodes;
-    private Set<Vertex> unvisitedNodes;
-    private Map<Vertex, Vertex> predecessors;
-    private Map<Vertex, Integer> distance;
+    private Set<RouteNode> visitedNodes;
+    private Set<RouteNode> unvisitedNodes;
+    private Map<RouteNode, RouteNode> predecessors;
+    private Map<RouteNode, Integer> distance;
 
 
     public ShortestPath(Graph graph){
@@ -28,7 +25,7 @@ public class ShortestPath {
     }
     
 
-    public void execute(Vertex source) {
+    public void execute(RouteNode source) {
 
         visitedNodes = new HashSet<>();
         unvisitedNodes = new HashSet<>();
@@ -39,14 +36,14 @@ public class ShortestPath {
         unvisitedNodes.add(source);
 
         while (unvisitedNodes.size() > 0) {
-            Vertex node = getMinimum(unvisitedNodes);
+            RouteNode node = getMinimum(unvisitedNodes);
             visitedNodes.add(node);
             unvisitedNodes.remove(node);
             findMinDistance(node);
         }
     }
 
-    private int getDistance(Vertex node, Vertex target) {
+    private int getDistance(RouteNode node, RouteNode target) {
         //TODO
         for (Edge edge : edgeList) {
             if (edge.getSource().equals(node)
@@ -57,9 +54,9 @@ public class ShortestPath {
         return -1;
     }
 
-    private List<Vertex> getNeighbors(Vertex node) {
+    private List<RouteNode> getNeighbors(RouteNode node) {
 
-        List<Vertex> neighbors = new ArrayList<>();
+        List<RouteNode> neighbors = new ArrayList<>();
 
         for (Edge edge : edgeList) {
             if (edge.getSource().equals(node) && !isVisited(edge.getDestination())) {
@@ -69,10 +66,10 @@ public class ShortestPath {
         return neighbors;
     }
 
-    private Vertex getMinimum(Set<Vertex> vertices) {
+    private RouteNode getMinimum(Set<RouteNode> vertices) {
 
-        Vertex min = null;
-        for (Vertex vertex : vertices) {
+        RouteNode min = null;
+        for (RouteNode vertex : vertices) {
             if (min == null) {
                 min = vertex;
             } else if (getShortestDistance(vertex) < getShortestDistance(min)) {
@@ -83,7 +80,7 @@ public class ShortestPath {
     }
 
 
-    private int getShortestDistance(Vertex destination) {
+    private int getShortestDistance(RouteNode destination) {
 
         Integer dist = distance.get(destination);
         if (dist == null) {
@@ -94,10 +91,10 @@ public class ShortestPath {
 
     }
 
-    private LinkedList<Vertex> getPath(Vertex target) {
+    private LinkedList<RouteNode> getPath(RouteNode target) {
 
-        LinkedList<Vertex> path = new LinkedList<>();
-        Vertex step = target;
+        LinkedList<RouteNode> path = new LinkedList<>();
+        RouteNode step = target;
 
         if (predecessors.get(step) == null) {
             step = predecessors.get(step);
@@ -108,11 +105,11 @@ public class ShortestPath {
         return path;
     }
 
-    private void findMinDistance(Vertex node) {
+    private void findMinDistance(RouteNode node) {
 
-        List<Vertex> adjNodes = getNeighbors(node);
+        List<RouteNode> adjNodes = getNeighbors(node);
 
-        for (Vertex target : adjNodes) {
+        for (RouteNode target : adjNodes) {
             if (getShortestDistance(target) > getShortestDistance(node)
                     + getDistance(node, target)){
                 distance.put(target, getShortestDistance(node)
@@ -123,78 +120,23 @@ public class ShortestPath {
         }
     }
 
+    private void addLane(String laneID, int sourceLocationNo,
+                         int destLocationNo, String duration) {
+
+        Edge lane = new Edge(laneID, nodeList.get(sourceLocationNo),
+                nodeList.get(destLocationNo), duration);
+        edgeList.add(lane);
+
+    }
+
     /**
      * Method: Check if a node has been visited.
-     * Inputs: vertex : Vertex
+     * Inputs: vertex : RouteNode
      * Returns: void
      * Description: Method to check if a node on the graph has been visited yet.
      */
-    private boolean isVisited(Vertex vertex) {
+    private boolean isVisited(RouteNode vertex) {
         return visitedNodes.contains(vertex);
-    }
-
-
-    /**
-     * File:	  Vertex
-     * Author:    Adam Clifton (akclifto@asu.edu)
-     * Date:      2019.11.29
-     * <p>
-     * Description:  Private nested class that will contain the graph vertices or nodes used to
-     * find the shortest path.
-     */
-    private class Vertex {
-
-        final private String id;
-        final private String name;
-
-        private Vertex(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        private String getId() {
-            return id;
-        }
-
-        private String getName() {
-            return name;
-        }
-
-        @Override
-        public int hashCode(){
-            final int prime = 17;
-            int result = 1;
-            result = prime * result + ((id == null) ? 0 : id.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object object) {
-
-            if (this == object) {
-                return true;
-            }
-            if (object == null) {
-                return false;
-            }
-            if (getClass() != object.getClass()) {
-                return false;
-            }
-            Vertex other = (Vertex) object;
-            if (id == null) {
-                if (other.id != null) {
-                    return false;
-                }
-            } else if (!id.equals(other.id)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
     }
 
 
@@ -209,31 +151,31 @@ public class ShortestPath {
     private class Edge {
 
         private final String id;
-        private final Vertex source;
-        private final Vertex destination;
-        private final int weight;
+        private final RouteNode source;
+        private final RouteNode destination;
+        private final String duration;
 
-        private Edge(String id, Vertex source, Vertex destination, int weight) {
+        private Edge(String id, RouteNode source, RouteNode destination, String duration) {
             this.id = id;
             this.source = source;
             this.destination = destination;
-            this.weight = weight;
+            this.duration = duration;
         }
 
         private String getId() {
             return id;
         }
 
-        private Vertex getDestination() {
+        private RouteNode getDestination() {
             return destination;
         }
 
-        private Vertex getSource() {
+        private RouteNode getSource() {
             return source;
         }
 
-        private int getWeight() {
-            return weight;
+        private String getWeight() {
+            return duration;
         }
 
         @Override
@@ -252,15 +194,15 @@ public class ShortestPath {
      */
     private class Graph {
 
-        private final List<Vertex> vertices;
+        private final List<RouteNode> vertices;
         private final List<Edge> edges;
 
-        private Graph(List<Vertex> verticex, List<Edge> edges) {
-            this.vertices = verticex;
+        private Graph(List<RouteNode> vertices, List<Edge> edges) {
+            this.vertices = vertices;
             this.edges = edges;
         }
 
-        public List<Vertex> getVertices() {
+        public List<RouteNode> getVertices() {
             return vertices;
         }
 
@@ -268,9 +210,4 @@ public class ShortestPath {
             return edges;
         }
     }
-
-
-
-
-
 }
