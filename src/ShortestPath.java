@@ -16,7 +16,7 @@ public class ShortestPath {
     private Set<RouteNode> visitedNodes;
     private Set<RouteNode> unvisitedNodes;
     private Map<RouteNode, RouteNode> predecessors;
-    private Map<RouteNode, Integer> distance;
+    private Map<RouteNode, Double> distance;
 
 
     public ShortestPath(Graph graph){
@@ -32,7 +32,7 @@ public class ShortestPath {
         distance = new HashMap<>();
         predecessors = new HashMap<>();
 
-        distance.put(source, 0);
+        distance.put(source, 0d);
         unvisitedNodes.add(source);
 
         while (unvisitedNodes.size() > 0) {
@@ -43,12 +43,17 @@ public class ShortestPath {
         }
     }
 
-    private int getDistance(RouteNode node, RouteNode target) {
+    private double getDistance(RouteNode node, RouteNode target) {
+
+        CalculateRoute calc = new CalculateRoute();
         //TODO
         for (Edge edge : edgeList) {
             if (edge.getSource().equals(node)
                     && edge.getDestination().equals(target)) {
-                return edge.getWeight();
+                double dist = calc.calculateDistance(node.getLat(), node.getLon(),
+                        target.getLat(), target.getLon());
+                return dist;
+                //return edge.getWeight();
             }
         }
         return -1;
@@ -80,9 +85,9 @@ public class ShortestPath {
     }
 
 
-    private int getShortestDistance(RouteNode destination) {
+    private double getShortestDistance(RouteNode destination) {
 
-        Integer dist = distance.get(destination);
+        Double dist = distance.get(destination);
         if (dist == null) {
             return Integer.MAX_VALUE;
         } else {
@@ -120,7 +125,7 @@ public class ShortestPath {
         }
     }
 
-    private void addLane(String laneID, int sourceLocationNo,
+    private void addEdgePath(String laneID, int sourceLocationNo,
                          int destLocationNo, String duration) {
 
         Edge lane = new Edge(laneID, nodeList.get(sourceLocationNo),
